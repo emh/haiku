@@ -1,0 +1,6 @@
+{
+  "devDependencies": {
+    "csv": "^6.2.8",
+    "openai": "^3.2.1"
+  }
+}
