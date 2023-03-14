@@ -1,8 +1,12 @@
 import { haikus } from './haikus.mjs';
 import { get, el } from './html.mjs';
 
-const s = Date.parse('2023-03-15');
+const key = () => {
+    const d = new Date(); // local time
 
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
+const s = Date.parse(key());
 const hash = (n) => (s + n + ~(n << 17) ^ (n >> 10) + (n << 3) ^ (n >> 6) + ~(n << 8) ^ (n >> 16)) % n;
 const alpha = (w) => w.toLowerCase().replaceAll(/[^a-z]/g, '');
 
