@@ -1,39 +1,20 @@
 import { haikus } from './haikus.mjs';
 import { get, el } from './html.mjs';
 
-const randInt = (n) => Math.floor(Math.random() * n);
-const coinToss = () => Math.random() < 0.5 ? -1 : 1;
-const shuffle = (l) => [...l].sort(coinToss);
-const div = (n, d) => ({ q: Math.floor(n / d), r: n % d });
-const split = (words) => {
-    const n = words.length;
-    const { q, r } = div(n, 3);
+const s = Date.parse('2023-03-15');
 
-    let [a, b] = [q, q];
-
-    if (r === 1) {
-        b++;
-    } else if (r === 2) {
-        a++;
-        b++;
-    }
-
-    return [
-        words.slice(0, a),
-        words.slice(a, a + b),
-        words.slice(a + b)
-    ];
-};
+const hash = (n) => (s + n + ~(n << 17) ^ (n >> 10) + (n << 3) ^ (n >> 6) + ~(n << 8) ^ (n >> 16)) % n;
 const alpha = (w) => w.toLowerCase().replaceAll(/[^a-z]/g, '');
-const words = (haiku) => haiku.join(' ').split(' ').map(alpha).filter((w) => w.length > 0);
 
-const haiku = haikus[randInt(haikus.length)];
-const haikuWords = words(haiku.haiku);
+const haiku = haikus[hash(haikus.length)];
+const solution = haiku.haiku.map((line) => line.split(' ').map(alpha).filter((w) => w.length > 0));
+const words = solution.flat();
+const board = solution.map((line) => line.map(() => words.splice(hash(words.length), 1)[0]));
 
 const state = {
     haiku,
-    board: split(shuffle(haikuWords)),
-    solution: haiku.haiku.map((line) => line.split(' ').map(alpha).filter((w) => w.length > 0)),
+    board,
+    solution,
     moves: 0
 };
 
@@ -69,38 +50,8 @@ const renderWord = (w, i, j) => {
     return el('div').attrs({ draggable: true }).classes([c, 'word']).events(events).children(w);
 };
 
-const renderDropZone = (i, front) => {
-    const events = {
-        drop: (e) => {
-            e.preventDefault();
-
-            const dropped = JSON.parse(e.dataTransfer.getData('text/plain'));
-
-            state.board[dropped.i].splice(dropped.j, 1);
-            state.board[i].splice(front ? 0 : -1, 0, dropped.w);
-
-            render();
-        },
-        dragenter: (e) => {
-            e.preventDefault();
-            e.target.classList.add('dragover');
-        },
-        dragleave: (e) => {
-            e.preventDefault();
-            e.target.classList.remove('dragover');
-        },
-        dragover: (e) => e.preventDefault()
-    };
-
-    return el('div.dropzone').events(events);
-}
-
 const renderLine = (l, i) => {
-    return el('div.line').children(
-        renderDropZone(i, true),
-        ...l.map((w, j) => renderWord(w, i, j)),
-        renderDropZone(i, false)
-    );
+    return el('div.line').children(...l.map((w, j) => renderWord(w, i, j)));
 };
 
 const renderBoard = (t) => el('div.board').children(...t.map(renderLine));
