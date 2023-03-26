@@ -358,23 +358,11 @@ copyButton.addEventListener('click', () => {
     //     }
     // );
 
-    // const type = "text/plain";
-    // const blob = new Blob(["hello world 3"], { type });
-    // const data = [new ClipboardItem({ [type]: blob })];
+    const type = "text/plain";
+    const blob = new Blob(["hello world 6"], { type });
+    const data = [new ClipboardItem({ [type]: blob })];
 
-    // navigator.clipboard.write(data).then(
-    //     () => {
-    //         document.querySelector('.copied').style.visibility = 'visible';
-    //     },
-    //     (err) => {
-    //         document.querySelector('.copied').style.visibility = 'visible';
-    //         document.querySelector('.copied').innerHTML = err;
-    //     }
-    // );
-
-
-
-    navigator.clipboard.writeText("hello world 5").then(
+    navigator.clipboard.write(data).then(
         () => {
             document.querySelector('.copied').style.visibility = 'visible';
         },
@@ -383,6 +371,18 @@ copyButton.addEventListener('click', () => {
             document.querySelector('.copied').innerHTML = err;
         }
     );
+
+
+
+    // navigator.clipboard.writeText("hello world 5").then(
+    //     () => {
+    //         document.querySelector('.copied').style.visibility = 'visible';
+    //     },
+    //     (err) => {
+    //         document.querySelector('.copied').style.visibility = 'visible';
+    //         document.querySelector('.copied').innerHTML = err;
+    //     }
+    // );
 });
 
 okButton.addEventListener('click', () => {
