@@ -316,12 +316,17 @@ function render() {
     if (solved()) {
         const dialog = get('success');
 
-        const button = dialog.querySelector('button');
+        const copyButton = dialog.querySelector('#copy');
+        const okButton = dialog.querySelector('#ok');
 
-        button.addEventListener('click', () => {
+        copyButton.addEventListener('click', () => {
             renderImage();
 
             dialog.querySelector('.copied').style.visibility = 'visible';
+        });
+
+        okButton.addEventListener('click', () => {
+            dialog.remove();
         });
 
         dialog.showModal();

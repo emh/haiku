@@ -82,6 +82,10 @@ dialog p {
     margin: 8px 0;
 }
 
+dialog h1 {
+    text-align: center;
+}
+
 dialog .buttons {
     text-align: center;
 }
