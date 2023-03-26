@@ -94,7 +94,7 @@ const state = {
     minMoves: minSwaps(board.flat(), solution.flat())
 };
 
-let canvas = null;
+let shareData = null;
 
 const solved = () => {
     for (let i = 0; i < state.solution.length; i++) {
@@ -211,7 +211,7 @@ const renderLine = (l, i) => {
 const renderBoard = (t) => el('div.board').children(...t.map(renderLine));
 
 function renderShareImage() {
-    canvas = document.createElement('canvas');
+    const canvas = document.createElement('canvas');
 
     const ctx = canvas.getContext('2d');
 
@@ -299,7 +299,11 @@ function renderShareImage() {
         ctx.drawImage(e.target, 0, 0);
         targetImg.src = canvas.toDataURL();
 
-        get('copy').removeAttribute('disabled');
+        canvas.toBlob((blob) => {
+            shareData = blob;
+
+            get('copy').removeAttribute('disabled');
+        }, "image/png");
     }
 }
 
@@ -333,20 +337,17 @@ const copyButton = get('copy');
 const okButton = get('ok');
 
 copyButton.addEventListener('click', () => {
-    canvas.toBlob((blob) => {
-        navigator.clipboard.write([
-            new ClipboardItem({ [blob.type]: blob })
-        ]).then(
-            () => {
-                document.querySelector('.copied').style.visibility = 'visible';
-            },
-            (err) => {
-                document.querySelector('.copied').style.visibility = 'visible';
-                document.querySelector('.copied').innerHTML = err;
-            }
-        );
-    }, "image/png");
-
+    navigator.clipboard.write([
+        new ClipboardItem({ [shareData.type]: shareData })
+    ]).then(
+        () => {
+            document.querySelector('.copied').style.visibility = 'visible';
+        },
+        (err) => {
+            document.querySelector('.copied').style.visibility = 'visible';
+            document.querySelector('.copied').innerHTML = err;
+        }
+    );
 
     // const type = "text/plain";
     // const blob = new Blob(["hello world 6"], { type });
