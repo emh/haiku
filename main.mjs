@@ -314,45 +314,6 @@ function render() {
     if (solved()) {
         const dialog = get('success');
 
-        const copyButton = dialog.querySelector('#copy');
-        const okButton = dialog.querySelector('#ok');
-
-        copyButton.addEventListener('click', () => {
-            // const canvas = await renderImage();
-
-            // canvas.toBlob((blob) => {
-            //     navigator.clipboard.write([
-            //         new ClipboardItem({ [blob.type]: blob })
-            //     ]).then(
-            //         () => {
-            //             document.querySelector('.copied').style.visibility = 'visible';
-            //         },
-            //         (err) => {
-            //             document.querySelector('.copied').style.visibility = 'visible';
-            //             document.querySelector('.copied').innerHTML = err;
-            //         }
-            //     );
-            // }, "image/png");
-
-            const type = "text/plain";
-            const blob = new Blob(["Hello World"], { type });
-            const data = [new ClipboardItem({ [type]: blob })];
-
-            navigator.clipboard.write(data).then(
-                () => {
-                    document.querySelector('.copied').style.visibility = 'visible';
-                },
-                (err) => {
-                    document.querySelector('.copied').style.visibility = 'visible';
-                    document.querySelector('.copied').innerHTML = err;
-                }
-            );
-        });
-
-        okButton.addEventListener('click', () => {
-            dialog.remove();
-        });
-
         dialog.showModal();
     }
 }
@@ -362,6 +323,55 @@ get('background').style.backgroundImage = `url('./backgrounds/${String(i + 1).pa
 const image = el('img').attrs({ src: `./backgrounds/${String(i + 1).padStart(3, '0')}.png` });
 
 get('background').append(image.build());
+
+const copyButton = get('copy');
+const okButton = get('ok');
+
+copyButton.addEventListener('click', () => {
+    // const canvas = await renderImage();
+
+    // canvas.toBlob((blob) => {
+    //     navigator.clipboard.write([
+    //         new ClipboardItem({ [blob.type]: blob })
+    //     ]).then(
+    //         () => {
+    //             document.querySelector('.copied').style.visibility = 'visible';
+    //         },
+    //         (err) => {
+    //             document.querySelector('.copied').style.visibility = 'visible';
+    //             document.querySelector('.copied').innerHTML = err;
+    //         }
+    //     );
+    // }, "image/png");
+
+    // const type = "text/plain";
+    // const blob = new Blob(["Hello World"], { type });
+    // const data = [new ClipboardItem({ [type]: blob })];
+
+    // navigator.clipboard.write(data).then(
+    //     () => {
+    //         document.querySelector('.copied').style.visibility = 'visible';
+    //     },
+    //     (err) => {
+    //         document.querySelector('.copied').style.visibility = 'visible';
+    //         document.querySelector('.copied').innerHTML = err;
+    //     }
+    // );
+
+    navigator.clipboard.writeText("hello world").then(
+        () => {
+            document.querySelector('.copied').style.visibility = 'visible';
+        },
+        (err) => {
+            document.querySelector('.copied').style.visibility = 'visible';
+            document.querySelector('.copied').innerHTML = err;
+        }
+    );
+});
+
+okButton.addEventListener('click', () => {
+    dialog.remove();
+});
 
 render();
 
