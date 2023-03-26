@@ -317,22 +317,36 @@ function render() {
         const copyButton = dialog.querySelector('#copy');
         const okButton = dialog.querySelector('#ok');
 
-        copyButton.addEventListener('click', async () => {
-            const canvas = await renderImage();
+        copyButton.addEventListener('click', () => {
+            // const canvas = await renderImage();
 
-            canvas.toBlob((blob) => {
-                navigator.clipboard.write([
-                    new ClipboardItem({ [blob.type]: blob })
-                ]).then(
-                    () => {
-                        document.querySelector('.copied').style.visibility = 'visible';
-                    },
-                    (err) => {
-                        document.querySelector('.copied').style.visibility = 'visible';
-                        document.querySelector('.copied').innerHTML = err;
-                    }
-                );
-            }, "image/png");
+            // canvas.toBlob((blob) => {
+            //     navigator.clipboard.write([
+            //         new ClipboardItem({ [blob.type]: blob })
+            //     ]).then(
+            //         () => {
+            //             document.querySelector('.copied').style.visibility = 'visible';
+            //         },
+            //         (err) => {
+            //             document.querySelector('.copied').style.visibility = 'visible';
+            //             document.querySelector('.copied').innerHTML = err;
+            //         }
+            //     );
+            // }, "image/png");
+
+            const type = "text/plain";
+            const blob = new Blob(["Hello World"], { type });
+            const data = [new ClipboardItem({ [type]: blob })];
+
+            navigator.clipboard.write(data).then(
+                () => {
+                    document.querySelector('.copied').style.visibility = 'visible';
+                },
+                (err) => {
+                    document.querySelector('.copied').style.visibility = 'visible';
+                    document.querySelector('.copied').innerHTML = err;
+                }
+            );
         });
 
         okButton.addEventListener('click', () => {
