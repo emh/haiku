@@ -81,10 +81,10 @@ function minSwaps(arr, sorted) {
 const i = randInt(haikus.length);
 const haiku = haikus[i];
 const solution = haiku.haiku.map((line) => line.split(' ').map(alpha).filter((w) => w.length > 0));
-// const board = shuffle(solution);
+const board = shuffle(solution);
 
-const board = deepCopy(solution); //shuffle(solution);
-[board[0][0], board[1][0]] = [board[1][0], board[0][0]];
+// const board = deepCopy(solution); //shuffle(solution);
+// [board[0][0], board[1][0]] = [board[1][0], board[0][0]];
 
 const state = {
     haiku,
@@ -348,37 +348,10 @@ copyButton.addEventListener('click', () => {
             document.querySelector('.copied').innerHTML = err;
         }
     );
-
-    // const type = "text/plain";
-    // const blob = new Blob(["hello world 6"], { type });
-    // const data = [new ClipboardItem({ [type]: blob })];
-
-    // navigator.clipboard.write(data).then(
-    //     () => {
-    //         document.querySelector('.copied').style.visibility = 'visible';
-    //     },
-    //     (err) => {
-    //         document.querySelector('.copied').style.visibility = 'visible';
-    //         document.querySelector('.copied').innerHTML = err;
-    //     }
-    // );
-
-
-
-    // navigator.clipboard.writeText("hello world 5").then(
-    //     () => {
-    //         document.querySelector('.copied').style.visibility = 'visible';
-    //     },
-    //     (err) => {
-    //         document.querySelector('.copied').style.visibility = 'visible';
-    //         document.querySelector('.copied').innerHTML = err;
-    //     }
-    // );
 });
 
 okButton.addEventListener('click', () => {
-    dialog.remove();
+    get('success').remove();
 });
 
 render();
-
