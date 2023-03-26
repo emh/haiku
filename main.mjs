@@ -83,6 +83,9 @@ const haiku = haikus[i];
 const solution = haiku.haiku.map((line) => line.split(' ').map(alpha).filter((w) => w.length > 0));
 const board = shuffle(solution);
 
+// const board = deepCopy(solution); //shuffle(solution);
+// [board[0][0], board[1][0]] = [board[1][0], board[0][0]];
+
 const state = {
     haiku,
     board,
@@ -205,6 +208,100 @@ const renderLine = (l, i) => {
 
 const renderBoard = (t) => el('div.board').children(...t.map(renderLine));
 
+function renderImage() {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    const board = document.querySelector('.board');
+    let { height, width } = board.getBoundingClientRect();
+
+    height *= 1.5;
+
+    canvas.width = width;
+    canvas.height = height;
+
+    const tempImg = document.createElement('img');
+    tempImg.addEventListener('load', onTempImageLoad);
+    tempImg.src = 'data:image/svg+xml,' + encodeURIComponent(`
+            <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
+                <foreignObject width="100%" height="100%">
+                    <style>
+                        #image-container {
+                            height: 100%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-family: 'Courier New', Courier, monospace;
+                            font-size: 24px;
+                        }
+
+                        .board {
+                            display: flex;
+                            flex-direction: column;
+                            gap: 24px;
+                            user-select: none;
+                            padding: 8px;
+                        }
+
+                        .line {
+                            display: flex;
+                            flex-wrap: wrap;
+                            justify-content: center;
+                            gap: 8px;
+                        }
+
+                        .word {
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            height: 32px;
+                            padding: 0 10px;
+                            border: solid 1px black;
+                            cursor: grab;
+                            background-color: white;
+                        }
+
+                        .perfect {
+                            background-color: lightblue;
+                        }
+                    </style>
+                    <div id="image-container" xmlns="http://www.w3.org/1999/xhtml">
+                        ${get('app').innerHTML}
+                    </div>
+                </foreignObject>
+            </svg>`);
+
+    const targetImg = document.createElement('img');
+    document.body.appendChild(targetImg);
+
+    const bgImg = document.querySelector('#background img');
+
+    function onTempImageLoad(e) {
+        let x = 0;
+        let y = 0;
+
+        while (y < height) {
+            ctx.drawImage(bgImg, x, y, 128, 128);
+
+            x += 128;
+
+            if (x > width) {
+                x = 0;
+                y += 128;
+            }
+        }
+
+        ctx.drawImage(e.target, 0, 0);
+        targetImg.src = canvas.toDataURL();
+
+        canvas.toBlob((blob) => {
+            navigator.clipboard.write([
+                new ClipboardItem({ "image/png": blob })
+            ]);
+        }, "image/png");
+    }
+}
+
 function render() {
     const app = get('app');
 
@@ -216,10 +313,26 @@ function render() {
 
     get('background').style.opacity = calcCorrectness(state.solution, state.board);
 
-    console.log('solved?', solved());
+    if (solved()) {
+        const dialog = get('success');
+
+        const button = dialog.querySelector('button');
+
+        button.addEventListener('click', () => {
+            renderImage();
+
+            dialog.querySelector('.copied').style.visibility = 'visible';
+        });
+
+        dialog.showModal();
+    }
 }
 
 get('background').style.backgroundImage = `url('./backgrounds/${String(i + 1).padStart(3, '0')}.png')`;
+
+const image = el('img').attrs({ src: `./backgrounds/${String(i + 1).padStart(3, '0')}.png` });
+
+get('background').append(image.build());
 
 render();
 

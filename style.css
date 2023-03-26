@@ -67,3 +67,27 @@ html, body {
 .source {
     border-color: lightsalmon;
 }
+
+img {
+    visibility: hidden;
+}
+
+dialog {
+    width: 400px;
+    margin: 20px;
+    padding: 8px;
+}
+
+dialog p {
+    margin: 8px 0;
+}
+
+dialog .buttons {
+    text-align: center;
+}
+
+dialog .copied {
+    text-align: center;
+    color: green;
+    visibility: hidden;
+}
