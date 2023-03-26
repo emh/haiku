@@ -1,21 +1,49 @@
 import { haikus } from './haikus.mjs';
 import { get, el } from './html.mjs';
 
-const key = () => {
-    const d = new Date();
-
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-};
-
-const seed = Date.parse(key());
-const hash = (n) => (seed + n + ~(n << 17) ^ (n >> 10) + (n << 3) ^ (n >> 6) + ~(n << 8) ^ (n >> 16)) % n;
 const alpha = (w) => w.toLowerCase().replaceAll(/[^a-z]/g, '');
 const randInt = (n) => Math.floor(Math.random() * n);
+const deepCopy = (solution) => solution.map((line) => [...line]);
 
-const haiku = haikus[randInt(haikus.length)];
-const solution = haiku.haiku.map((line) => line.split(' ').map(alpha).filter((w) => w.length > 0));
-const words = solution.flat();
-const board = solution.map((line) => line.map(() => words.splice(hash(words.length), 1)[0]));
+function calcCorrectness(solution, board) {
+    const numWords = solution.flat().length;
+    let correctWords = 0;
+
+    board.forEach((line, i) => line.forEach((word, j) => {
+        if (solution[i][j] === word) {
+            correctWords += 1;
+        } else if (solution[i].indexOf(word) > -1) {
+            correctWords += 0.5;
+        }
+    }));
+
+    return correctWords / numWords;
+}
+
+function shuffle(solution) {
+    const copy = deepCopy(solution);
+
+    for (let i = 0; i < copy.length; i++) {
+        for (let j = 0; j < copy[i].length; j++) {
+            let found = false;
+            let k = null;
+            let l = null;
+            let y = 0;
+
+            while (!found && y < 10000) {
+                k = (i + (randInt(2) + 1)) % 3;
+                l = randInt(copy[k].length);
+                y++;
+
+                found = solution[i].indexOf(copy[k][l]) === -1 && solution[k].indexOf(copy[i][j]) === -1;
+            }
+
+            [copy[i][j], copy[k][l]] = [copy[k][l], copy[i][j]];
+        }
+    }
+
+    return copy;
+}
 
 function minSwaps(arr, sorted) {
     const unsortedIndexMap = new Map();
@@ -50,16 +78,18 @@ function minSwaps(arr, sorted) {
     return swaps;
 }
 
+const i = randInt(haikus.length);
+const haiku = haikus[i];
+const solution = haiku.haiku.map((line) => line.split(' ').map(alpha).filter((w) => w.length > 0));
+const board = shuffle(solution);
+
 const state = {
-    key: key(),
     haiku,
     board,
     solution,
     moves: 0,
     minMoves: minSwaps(board.flat(), solution.flat())
 };
-
-console.log(state);
 
 const solved = () => {
     for (let i = 0; i < state.solution.length; i++) {
@@ -184,8 +214,12 @@ function render() {
         renderBoard(state.board).build()
     );
 
+    get('background').style.opacity = calcCorrectness(state.solution, state.board);
+
     console.log('solved?', solved());
 }
+
+get('background').style.backgroundImage = `url('./backgrounds/${String(i + 1).padStart(3, '0')}.png')`;
 
 render();
 
