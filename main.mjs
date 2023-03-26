@@ -208,21 +208,22 @@ const renderLine = (l, i) => {
 
 const renderBoard = (t) => el('div.board').children(...t.map(renderLine));
 
-function renderImage() {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
+async function renderImage() {
+    return new Promise((resolve, reject) => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
 
-    const board = document.querySelector('.board');
-    let { height, width } = board.getBoundingClientRect();
+        const board = document.querySelector('.board');
+        let { height, width } = board.getBoundingClientRect();
 
-    height *= 1.5;
+        height *= 1.5;
 
-    canvas.width = width;
-    canvas.height = height;
+        canvas.width = width;
+        canvas.height = height;
 
-    const tempImg = document.createElement('img');
-    tempImg.addEventListener('load', onTempImageLoad);
-    tempImg.src = 'data:image/svg+xml,' + encodeURIComponent(`
+        const tempImg = document.createElement('img');
+        tempImg.addEventListener('load', onTempImageLoad);
+        tempImg.src = 'data:image/svg+xml,' + encodeURIComponent(`
             <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
                 <foreignObject width="100%" height="100%">
                     <style>
@@ -271,43 +272,32 @@ function renderImage() {
                 </foreignObject>
             </svg>`);
 
-    const targetImg = document.createElement('img');
-    document.body.appendChild(targetImg);
+        const targetImg = document.createElement('img');
+        document.body.appendChild(targetImg);
 
-    const bgImg = document.querySelector('#background img');
+        const bgImg = document.querySelector('#background img');
 
-    function onTempImageLoad(e) {
-        let x = 0;
-        let y = 0;
+        function onTempImageLoad(e) {
+            let x = 0;
+            let y = 0;
 
-        while (y < height) {
-            ctx.drawImage(bgImg, x, y, 128, 128);
+            while (y < height) {
+                ctx.drawImage(bgImg, x, y, 128, 128);
 
-            x += 128;
+                x += 128;
 
-            if (x > width) {
-                x = 0;
-                y += 128;
-            }
-        }
-
-        ctx.drawImage(e.target, 0, 0);
-        targetImg.src = canvas.toDataURL();
-
-        canvas.toBlob((blob) => {
-            navigator.clipboard.write([
-                new ClipboardItem({ "image/png": blob })
-            ]).then(
-                () => {
-                    document.querySelector('.copied').style.visibility = 'visible';
-                },
-                (err) => {
-                    document.querySelector('.copied').style.visibility = 'visible';
-                    document.querySelector('.copied').innerHTML = err;
+                if (x > width) {
+                    x = 0;
+                    y += 128;
                 }
-            );
-        }, "image/png");
-    }
+            }
+
+            ctx.drawImage(e.target, 0, 0);
+            targetImg.src = canvas.toDataURL();
+
+            resolve(canvas);
+        }
+    };
 }
 
 function render() {
@@ -328,7 +318,21 @@ function render() {
         const okButton = dialog.querySelector('#ok');
 
         copyButton.addEventListener('click', () => {
-            renderImage();
+            const canvas = await renderImage();
+
+            canvas.toBlob((blob) => {
+                navigator.clipboard.write([
+                    new ClipboardItem({ [blob.type]: blob })
+                ]).then(
+                    () => {
+                        document.querySelector('.copied').style.visibility = 'visible';
+                    },
+                    (err) => {
+                        document.querySelector('.copied').style.visibility = 'visible';
+                        document.querySelector('.copied').innerHTML = err;
+                    }
+                );
+            }, "image/png");
         });
 
         okButton.addEventListener('click', () => {
