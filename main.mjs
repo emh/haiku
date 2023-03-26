@@ -81,10 +81,10 @@ function minSwaps(arr, sorted) {
 const i = randInt(haikus.length);
 const haiku = haikus[i];
 const solution = haiku.haiku.map((line) => line.split(' ').map(alpha).filter((w) => w.length > 0));
-const board = shuffle(solution);
+// const board = shuffle(solution);
 
-// const board = deepCopy(solution); //shuffle(solution);
-// [board[0][0], board[1][0]] = [board[1][0], board[0][0]];
+const board = deepCopy(solution); //shuffle(solution);
+[board[0][0], board[1][0]] = [board[1][0], board[0][0]];
 
 const state = {
     haiku,
@@ -297,7 +297,15 @@ function renderImage() {
         canvas.toBlob((blob) => {
             navigator.clipboard.write([
                 new ClipboardItem({ "image/png": blob })
-            ]);
+            ]).then(
+                () => {
+                    document.querySelector('.copied').style.visibility = 'visible';
+                },
+                (err) => {
+                    document.querySelector('.copied').style.visibility = 'visible';
+                    document.querySelector('.copied').innerHTML = err;
+                }
+            );
         }, "image/png");
     }
 }
@@ -321,8 +329,6 @@ function render() {
 
         copyButton.addEventListener('click', () => {
             renderImage();
-
-            dialog.querySelector('.copied').style.visibility = 'visible';
         });
 
         okButton.addEventListener('click', () => {
