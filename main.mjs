@@ -94,6 +94,8 @@ const state = {
     minMoves: minSwaps(board.flat(), solution.flat())
 };
 
+let canvas = null;
+
 const solved = () => {
     for (let i = 0; i < state.solution.length; i++) {
         for (let j = 0; j < state.solution[i].length; j++) {
@@ -208,96 +210,97 @@ const renderLine = (l, i) => {
 
 const renderBoard = (t) => el('div.board').children(...t.map(renderLine));
 
-async function renderImage() {
-    return new Promise((resolve, reject) => {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
+function renderShareImage() {
+    canvas = document.createElement('canvas');
 
-        const board = document.querySelector('.board');
-        let { height, width } = board.getBoundingClientRect();
+    const ctx = canvas.getContext('2d');
 
-        height *= 1.5;
+    canvas.style.visibility = 'hidden';
 
-        canvas.width = width;
-        canvas.height = height;
+    const board = document.querySelector('.board');
+    let { height, width } = board.getBoundingClientRect();
 
-        const tempImg = document.createElement('img');
-        tempImg.addEventListener('load', onTempImageLoad);
-        tempImg.src = 'data:image/svg+xml,' + encodeURIComponent(`
-            <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
-                <foreignObject width="100%" height="100%">
-                    <style>
-                        #image-container {
-                            height: 100%;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            font-family: 'Courier New', Courier, monospace;
-                            font-size: 24px;
-                        }
+    height *= 1.5;
 
-                        .board {
-                            display: flex;
-                            flex-direction: column;
-                            gap: 24px;
-                            user-select: none;
-                            padding: 8px;
-                        }
+    canvas.width = width;
+    canvas.height = height;
 
-                        .line {
-                            display: flex;
-                            flex-wrap: wrap;
-                            justify-content: center;
-                            gap: 8px;
-                        }
+    const tempImg = document.createElement('img');
+    tempImg.addEventListener('load', onTempImageLoad);
+    tempImg.src = 'data:image/svg+xml,' + encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
+            <foreignObject width="100%" height="100%">
+                <style>
+                    #image-container {
+                        height: 100%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-family: 'Courier New', Courier, monospace;
+                        font-size: 24px;
+                    }
 
-                        .word {
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            height: 32px;
-                            padding: 0 10px;
-                            border: solid 1px black;
-                            cursor: grab;
-                            background-color: white;
-                        }
+                    .board {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 24px;
+                        user-select: none;
+                        padding: 8px;
+                    }
 
-                        .perfect {
-                            background-color: lightblue;
-                        }
-                    </style>
-                    <div id="image-container" xmlns="http://www.w3.org/1999/xhtml">
-                        ${get('app').innerHTML}
-                    </div>
-                </foreignObject>
-            </svg>`);
+                    .line {
+                        display: flex;
+                        flex-wrap: wrap;
+                        justify-content: center;
+                        gap: 8px;
+                    }
 
-        const targetImg = document.createElement('img');
-        document.body.appendChild(targetImg);
+                    .word {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        height: 32px;
+                        padding: 0 10px;
+                        border: solid 1px black;
+                        cursor: grab;
+                        background-color: white;
+                    }
 
-        const bgImg = document.querySelector('#background img');
+                    .perfect {
+                        background-color: lightblue;
+                    }
+                </style>
+                <div id="image-container" xmlns="http://www.w3.org/1999/xhtml">
+                    ${get('app').innerHTML}
+                </div>
+            </foreignObject>
+        </svg>`);
 
-        function onTempImageLoad(e) {
-            let x = 0;
-            let y = 0;
+    const targetImg = document.createElement('img');
+    document.body.appendChild(targetImg);
 
-            while (y < height) {
-                ctx.drawImage(bgImg, x, y, 128, 128);
+    const bgImg = document.querySelector('#background img');
 
-                x += 128;
+    function onTempImageLoad(e) {
+        let x = 0;
+        let y = 0;
 
-                if (x > width) {
-                    x = 0;
-                    y += 128;
-                }
+        while (y < height) {
+            ctx.drawImage(bgImg, x, y, 128, 128);
+
+            x += 128;
+
+            if (x > width) {
+                x = 0;
+                y += 128;
             }
-
-            ctx.drawImage(e.target, 0, 0);
-            targetImg.src = canvas.toDataURL();
-
-            resolve(canvas);
         }
-    });
+
+        ctx.drawImage(e.target, 0, 0);
+        targetImg.src = canvas.toDataURL();
+
+        get('copy').removeAttribute('disabled');
+    }
 }
 
 function render() {
@@ -312,6 +315,8 @@ function render() {
     get('background').style.opacity = calcCorrectness(state.solution, state.board);
 
     if (solved()) {
+        renderShareImage();
+
         const dialog = get('success');
 
         dialog.showModal();
@@ -328,24 +333,23 @@ const copyButton = get('copy');
 const okButton = get('ok');
 
 copyButton.addEventListener('click', () => {
-    // const canvas = await renderImage();
+    canvas.toBlob((blob) => {
+        navigator.clipboard.write([
+            new ClipboardItem({ [blob.type]: blob })
+        ]).then(
+            () => {
+                document.querySelector('.copied').style.visibility = 'visible';
+            },
+            (err) => {
+                document.querySelector('.copied').style.visibility = 'visible';
+                document.querySelector('.copied').innerHTML = err;
+            }
+        );
+    }, "image/png");
 
-    // canvas.toBlob((blob) => {
-    //     navigator.clipboard.write([
-    //         new ClipboardItem({ [blob.type]: blob })
-    //     ]).then(
-    //         () => {
-    //             document.querySelector('.copied').style.visibility = 'visible';
-    //         },
-    //         (err) => {
-    //             document.querySelector('.copied').style.visibility = 'visible';
-    //             document.querySelector('.copied').innerHTML = err;
-    //         }
-    //     );
-    // }, "image/png");
 
     // const type = "text/plain";
-    // const blob = new Blob(["Hello World 2"], { type });
+    // const blob = new Blob(["hello world 6"], { type });
     // const data = [new ClipboardItem({ [type]: blob })];
 
     // navigator.clipboard.write(data).then(
@@ -357,20 +361,6 @@ copyButton.addEventListener('click', () => {
     //         document.querySelector('.copied').innerHTML = err;
     //     }
     // );
-
-    const type = "text/plain";
-    const blob = new Blob(["hello world 6"], { type });
-    const data = [new ClipboardItem({ [type]: blob })];
-
-    navigator.clipboard.write(data).then(
-        () => {
-            document.querySelector('.copied').style.visibility = 'visible';
-        },
-        (err) => {
-            document.querySelector('.copied').style.visibility = 'visible';
-            document.querySelector('.copied').innerHTML = err;
-        }
-    );
 
 
 
