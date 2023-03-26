@@ -358,7 +358,11 @@ copyButton.addEventListener('click', () => {
     //     }
     // );
 
-    navigator.clipboard.writeText("hello world").then(
+    const type = "text/plain";
+    const blob = new Blob(["hello world"], { type });
+    const data = [new ClipboardItem({ [type]: blob })];
+
+    navigator.clipboard.write(data).then(
         () => {
             document.querySelector('.copied').style.visibility = 'visible';
         },
@@ -367,6 +371,17 @@ copyButton.addEventListener('click', () => {
             document.querySelector('.copied').innerHTML = err;
         }
     );
+
+
+    // navigator.clipboard.writeText("hello world").then(
+    //     () => {
+    //         document.querySelector('.copied').style.visibility = 'visible';
+    //     },
+    //     (err) => {
+    //         document.querySelector('.copied').style.visibility = 'visible';
+    //         document.querySelector('.copied').innerHTML = err;
+    //     }
+    // );
 });
 
 okButton.addEventListener('click', () => {
