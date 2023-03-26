@@ -329,7 +329,7 @@ function render() {
 
 get('background').style.backgroundImage = `url('./backgrounds/${String(i + 1).padStart(3, '0')}.png')`;
 
-const image = el('img').attrs({ src: `./backgrounds/${String(i + 1).padStart(3, '0')}.png` });
+const image = el('img').attrs({ height: '0px', width: '0px', src: `./backgrounds/${String(i + 1).padStart(3, '0')}.png` });
 
 get('background').append(image.build());
 
