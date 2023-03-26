@@ -154,13 +154,13 @@ const renderWord = (w, i, j) => {
         sourceNode.classList.add('source');
 
         document.addEventListener('mousemove', handleDragMove);
-        document.addEventListener('touchmove', handleDragMove);
+        document.addEventListener('touchmove', handleDragMove, false);
         document.addEventListener('mouseup', handleDragEnd);
         document.addEventListener('touchend', handleDragEnd);
     }
 
     function handleDragMove(e) {
-        e.preventDefault();
+        // e.preventDefault();
 
         updatePosition(e);
 
@@ -358,11 +358,23 @@ copyButton.addEventListener('click', () => {
     //     }
     // );
 
-    const type = "text/plain";
-    const blob = new Blob(["hello world 3"], { type });
-    const data = [new ClipboardItem({ [type]: blob })];
+    // const type = "text/plain";
+    // const blob = new Blob(["hello world 3"], { type });
+    // const data = [new ClipboardItem({ [type]: blob })];
 
-    navigator.clipboard.write(data).then(
+    // navigator.clipboard.write(data).then(
+    //     () => {
+    //         document.querySelector('.copied').style.visibility = 'visible';
+    //     },
+    //     (err) => {
+    //         document.querySelector('.copied').style.visibility = 'visible';
+    //         document.querySelector('.copied').innerHTML = err;
+    //     }
+    // );
+
+
+
+    navigator.clipboard.writeText("hello world 4").then(
         () => {
             document.querySelector('.copied').style.visibility = 'visible';
         },
