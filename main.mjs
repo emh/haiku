@@ -344,22 +344,8 @@ copyButton.addEventListener('click', () => {
     //     );
     // }, "image/png");
 
-    // const type = "text/plain";
-    // const blob = new Blob(["Hello World"], { type });
-    // const data = [new ClipboardItem({ [type]: blob })];
-
-    // navigator.clipboard.write(data).then(
-    //     () => {
-    //         document.querySelector('.copied').style.visibility = 'visible';
-    //     },
-    //     (err) => {
-    //         document.querySelector('.copied').style.visibility = 'visible';
-    //         document.querySelector('.copied').innerHTML = err;
-    //     }
-    // );
-
     const type = "text/plain";
-    const blob = new Blob(["hello world"], { type });
+    const blob = new Blob(["Hello World 2"], { type });
     const data = [new ClipboardItem({ [type]: blob })];
 
     navigator.clipboard.write(data).then(
@@ -372,8 +358,11 @@ copyButton.addEventListener('click', () => {
         }
     );
 
+    // const type = "text/plain";
+    // const blob = new Blob(["hello world"], { type });
+    // const data = [new ClipboardItem({ [type]: blob })];
 
-    // navigator.clipboard.writeText("hello world").then(
+    // navigator.clipboard.write(data).then(
     //     () => {
     //         document.querySelector('.copied').style.visibility = 'visible';
     //     },
