@@ -297,7 +297,7 @@ async function renderImage() {
 
             resolve(canvas);
         }
-    };
+    });
 }
 
 function render() {
@@ -317,7 +317,7 @@ function render() {
         const copyButton = dialog.querySelector('#copy');
         const okButton = dialog.querySelector('#ok');
 
-        copyButton.addEventListener('click', () => {
+        copyButton.addEventListener('click', async () => {
             const canvas = await renderImage();
 
             canvas.toBlob((blob) => {
